@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.33423.256
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HBA_ProgrammingForTheCloud", "HBA_ProgrammingForTheCloud\HBA_ProgrammingForTheCloud.csproj", "{D01BFFBB-9013-4834-B5F8-B7EA3A945069}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D01BFFBB-9013-4834-B5F8-B7EA3A945069}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D01BFFBB-9013-4834-B5F8-B7EA3A945069}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D01BFFBB-9013-4834-B5F8-B7EA3A945069}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D01BFFBB-9013-4834-B5F8-B7EA3A945069}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {DB8BA523-2D33-4714-88A8-5AA9CF6D8ED9}
+	EndGlobalSection
+EndGlobal
