@@ -33,5 +33,62 @@ namespace HBA_ProgrammingForTheCloud.DataAccess
 
             return uploads;
         }
+
+        public async Task<string> GetBookId(string bucketId)
+        {
+            Query booksQuery = db.Collection("uploads").WhereEqualTo("BucketId", bucketId);
+            QuerySnapshot booksQuerySnapshot = await booksQuery.GetSnapshotAsync();
+
+            DocumentSnapshot documentSnapshot = booksQuerySnapshot.Documents.FirstOrDefault();
+            if (documentSnapshot.Exists == false) throw new Exception("Upload does not exist");
+            else
+            {
+                var id = documentSnapshot.Id;
+                return id;
+            }
+        }
+
+        public async void Update(Upload up)
+        {
+            Query booksQuery = db.Collection("uploads").WhereEqualTo("BucketId", up.BucketId);
+            QuerySnapshot booksQuerySnapshot = await booksQuery.GetSnapshotAsync();
+
+            DocumentSnapshot documentSnapshot = booksQuerySnapshot.Documents.FirstOrDefault();
+            if (documentSnapshot.Exists == false) throw new Exception("Upload does not exist");
+            else
+            {
+                DocumentReference booksRef = db.Collection("uploads").Document(documentSnapshot.Id);
+                await booksRef.SetAsync(up);
+            }
+        }
+
+        public async Task<Upload> GetBook(string bucketId)
+        {
+            Query booksQuery = db.Collection("uploads").WhereEqualTo("BucketId", bucketId);
+            QuerySnapshot booksQuerySnapshot = await booksQuery.GetSnapshotAsync();
+
+            DocumentSnapshot documentSnapshot = booksQuerySnapshot.Documents.FirstOrDefault();
+            if (documentSnapshot.Exists == false) return null;
+            else
+            {
+                Upload result = documentSnapshot.ConvertTo<Upload>();
+                return result;
+            }
+        }
+
+        public async Task Delete(string bucketId)
+        {
+
+            Query booksQuery = db.Collection("uploads").WhereEqualTo("BucketId", bucketId);
+            QuerySnapshot booksQuerySnapshot = await booksQuery.GetSnapshotAsync();
+
+            DocumentSnapshot documentSnapshot = booksQuerySnapshot.Documents.FirstOrDefault();
+            if (documentSnapshot.Exists == false) throw new Exception("Upload does not exist");
+            else
+            {
+                DocumentReference booksRef = db.Collection("uploads").Document(documentSnapshot.Id);
+                await booksRef.DeleteAsync();
+            }
+        }
     }
 }

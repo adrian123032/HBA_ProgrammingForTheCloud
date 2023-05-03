@@ -14,19 +14,19 @@ namespace HBA_ProgrammingForTheCloud.Models
         [Required]
         public string VideoName { get; set; }
         [FirestoreProperty]
-        [Required]
-        public DateTime UploadDate { get; set; }
+        public Timestamp UploadDate { get; set; }
+        public DateTime DTUpload
+        {
+            get { return UploadDate.ToDateTime(); }
+            set { UploadDate = Google.Cloud.Firestore.Timestamp.FromDateTime(value.ToUniversalTime()); }
+        }
         [FirestoreProperty]
-        [Required]
-        public string UserId { get; set; }
+        public string Username { get; set; }
         [FirestoreProperty]
-        [Required]
         public string BucketId { get; set; }
         [FirestoreProperty]
-        [Required]
         public string ThumbnailUrl { get; set; }
         [FirestoreProperty]
-        [Required]
         public bool Active { get; set; }
     }
 }

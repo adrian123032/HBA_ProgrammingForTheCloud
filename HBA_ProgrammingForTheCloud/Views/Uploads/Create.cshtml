@@ -1,4 +1,6 @@
-﻿@model HBA_ProgrammingForTheCloud.Models.Upload
+﻿@using Google.Cloud.Firestore;
+
+@model HBA_ProgrammingForTheCloud.Models.Upload
 
 @{
     ViewData["Title"] = "Create";
@@ -16,31 +18,6 @@
                 <label asp-for="VideoName" class="control-label"></label>
                 <input asp-for="VideoName" class="form-control" />
                 <span asp-validation-for="VideoName" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="UploadDate" class="control-label"></label>
-                <input asp-for="UploadDate" class="form-control" />
-                <span asp-validation-for="UploadDate" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="UserId" class="control-label"></label>
-                <input asp-for="UserId" class="form-control" />
-                <span asp-validation-for="UserId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="BucketId" class="control-label"></label>
-                <input asp-for="BucketId" class="form-control" />
-                <span asp-validation-for="BucketId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ThumbnailUrl" class="control-label"></label>
-                <input asp-for="ThumbnailUrl" class="form-control" />
-                <span asp-validation-for="ThumbnailUrl" class="text-danger"></span>
-            </div>
-            <div class="form-group form-check">
-                <label class="form-check-label">
-                    <input class="form-check-input" asp-for="Active" /> @Html.DisplayNameFor(model => model.Active)
-                </label>
             </div>
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
