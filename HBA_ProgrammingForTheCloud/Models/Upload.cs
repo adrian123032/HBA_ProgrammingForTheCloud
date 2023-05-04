@@ -28,5 +28,7 @@ namespace HBA_ProgrammingForTheCloud.Models
         public string ThumbnailString { get; set; }
         [FirestoreProperty]
         public bool Transcribed { get; set; }
+        [FirestoreProperty]
+        public string Transcription { get; set; }  
     }
 }

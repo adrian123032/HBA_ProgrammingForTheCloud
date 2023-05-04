@@ -27,7 +27,7 @@ namespace HBA_ProgrammingForTheCloud.Controllers
         }
         public async Task<IActionResult> Index()
         {
-            var list = await _uploadsRepo.GetUploads();
+            var list = await _uploadsRepo.GetUploads(User.Identity.Name);
             return View(list);
         }
 
@@ -41,12 +41,9 @@ namespace HBA_ProgrammingForTheCloud.Controllers
         {
             up.UploadDate = Timestamp.FromDateTime(DateTime.Now.ToUniversalTime());
             up.Username = User.Identity.Name;
-            up.BucketId = "123";
-            up.ThumbnailString = "123";
             up.Transcribed = false;
 
             byte[] bytes;
-
             string fileExtension = ""; 
             if (file != null)
             {
@@ -125,8 +122,9 @@ namespace HBA_ProgrammingForTheCloud.Controllers
 
 
 
-        public IActionResult Transcribe(Upload up)
+        public async Task<IActionResult> Transcribe(string bucketId)
         {
+            Upload up = await _uploadsRepo.GetUpload(bucketId);
             try
             {
                 _uploadsRepo.Update(up);
@@ -138,7 +136,7 @@ namespace HBA_ProgrammingForTheCloud.Controllers
                 _logger.LogError(ex, $"{User.Identity.Name} had an error while updating an upload");
                 TempData["error"] = "Upload could not be updated";
             }
-            return View(up);
+            return RedirectToAction("Index");
         }
     }
 }

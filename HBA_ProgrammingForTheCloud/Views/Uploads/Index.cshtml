@@ -1,6 +1,4 @@
-﻿@using System.IO;
-@using System.Drawing;
-@model IEnumerable<HBA_ProgrammingForTheCloud.Models.Upload>
+﻿@model IEnumerable<HBA_ProgrammingForTheCloud.Models.Upload>
 
 @{
     ViewData["Title"] = "Index";
@@ -51,13 +49,13 @@
                 @Html.DisplayFor(modelItem => item.BucketId)
             </td>
             <td>
-                <img sre="data:image/jpeg;base64, &item.ThumbnailString" style="width: 100px; height: 100px;" />
+                <img src="data:image/png;base64, @item.ThumbnailString" style="width: 100px; height: 100px;" />
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Transcribed)
             </td>
             <td>
-                @Html.ActionLink("Transcribe", "Transcribe", new {  up=item  }) 
+                @Html.ActionLink("Transcribe", "Transcribe", new { bucketId = item.BucketId }) 
                 @Html.ActionLink("Delete", "Delete", new {  bucketId=item.BucketId  })
                 <a href="@item.BucketId">Download</a>
             </td>

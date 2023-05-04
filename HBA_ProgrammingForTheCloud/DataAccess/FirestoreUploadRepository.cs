@@ -5,8 +5,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
+
 namespace HBA_ProgrammingForTheCloud.DataAccess
 {
+
     public class FirestoreUploadRepository
     {
         FirestoreDb db;
@@ -20,7 +22,7 @@ namespace HBA_ProgrammingForTheCloud.DataAccess
             await db.Collection("uploads").Document().SetAsync(up);
         }
 
-        public async Task<List<Upload>> GetUploads()
+        public async Task<List<Upload>> GetUploads(string username)
         {
             List<Upload> uploads = new List<Upload>();
             Query allUploadsQuery = db.Collection("uploads");
@@ -28,24 +30,13 @@ namespace HBA_ProgrammingForTheCloud.DataAccess
             foreach(DocumentSnapshot documentSnapshot in allUploadsQuerySnapshot.Documents)
             {
                 Upload up = documentSnapshot.ConvertTo<Upload>();
-                uploads.Add(up);
+                if (up.Username == username)
+                {
+                    uploads.Add(up);
+                }
             }
 
             return uploads;
-        }
-
-        public async Task<string> GetBookId(string bucketId)
-        {
-            Query uploadsQuery = db.Collection("uploads").WhereEqualTo("BucketId", bucketId);
-            QuerySnapshot uploadsQuerySnapshot = await uploadsQuery.GetSnapshotAsync();
-
-            DocumentSnapshot documentSnapshot = uploadsQuerySnapshot.Documents.FirstOrDefault();
-            if (documentSnapshot.Exists == false) throw new Exception("Upload does not exist");
-            else
-            {
-                var id = documentSnapshot.Id;
-                return id;
-            }
         }
 
         public async void Update(Upload up)
@@ -62,7 +53,7 @@ namespace HBA_ProgrammingForTheCloud.DataAccess
             }
         }
 
-        public async Task<Upload> GetBook(string bucketId)
+        public async Task<Upload> GetUpload(string bucketId)
         {
             Query booksQuery = db.Collection("uploads").WhereEqualTo("BucketId", bucketId);
             QuerySnapshot booksQuerySnapshot = await booksQuery.GetSnapshotAsync();
