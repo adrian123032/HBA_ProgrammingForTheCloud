@@ -18,15 +18,15 @@ namespace HBA_ProgrammingForTheCloud.Models
         public DateTime DTUpload
         {
             get { return UploadDate.ToDateTime(); }
-            set { UploadDate = Google.Cloud.Firestore.Timestamp.FromDateTime(value.ToUniversalTime()); }
+            set { UploadDate = Timestamp.FromDateTime(value.ToUniversalTime()); }
         }
         [FirestoreProperty]
         public string Username { get; set; }
         [FirestoreProperty]
         public string BucketId { get; set; }
         [FirestoreProperty]
-        public string ThumbnailUrl { get; set; }
+        public string ThumbnailString { get; set; }
         [FirestoreProperty]
-        public bool Active { get; set; }
+        public bool Transcribed { get; set; }
     }
 }

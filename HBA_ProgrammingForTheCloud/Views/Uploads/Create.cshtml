@@ -12,12 +12,26 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Create">
+        <form asp-action="Create" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="VideoName" class="control-label"></label>
                 <input asp-for="VideoName" class="form-control" />
                 <span asp-validation-for="VideoName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label class="control-label">Upload Movie</label>
+                <input type="file" name="file" class="form-control" />
+                <div class="invalid-feedback">
+                    Please provide a file.
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label">Upload Thumbnail</label>
+                <input type="file" name="thumbnail" class="form-control" />
+                <div class="invalid-feedback">
+                    Please provide a thumbnail.
+                </div>
             </div>
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />

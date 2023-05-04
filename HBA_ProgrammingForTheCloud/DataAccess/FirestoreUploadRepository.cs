@@ -36,10 +36,10 @@ namespace HBA_ProgrammingForTheCloud.DataAccess
 
         public async Task<string> GetBookId(string bucketId)
         {
-            Query booksQuery = db.Collection("uploads").WhereEqualTo("BucketId", bucketId);
-            QuerySnapshot booksQuerySnapshot = await booksQuery.GetSnapshotAsync();
+            Query uploadsQuery = db.Collection("uploads").WhereEqualTo("BucketId", bucketId);
+            QuerySnapshot uploadsQuerySnapshot = await uploadsQuery.GetSnapshotAsync();
 
-            DocumentSnapshot documentSnapshot = booksQuerySnapshot.Documents.FirstOrDefault();
+            DocumentSnapshot documentSnapshot = uploadsQuerySnapshot.Documents.FirstOrDefault();
             if (documentSnapshot.Exists == false) throw new Exception("Upload does not exist");
             else
             {

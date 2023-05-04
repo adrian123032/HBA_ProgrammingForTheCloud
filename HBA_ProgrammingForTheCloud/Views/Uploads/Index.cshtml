@@ -1,0 +1,67 @@
+﻿@using System.IO;
+@using System.Drawing;
+@model IEnumerable<HBA_ProgrammingForTheCloud.Models.Upload>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.VideoName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DTUpload)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Username)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.BucketId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ThumbnailString)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Transcribed)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.VideoName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DTUpload)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Username)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.BucketId)
+            </td>
+            <td>
+                <img sre="data:image/jpeg;base64, &item.ThumbnailString" style="width: 100px; height: 100px;" />
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Transcribed)
+            </td>
+            <td>
+                @Html.ActionLink("Transcribe", "Transcribe", new {  up=item  }) 
+                @Html.ActionLink("Delete", "Delete", new {  bucketId=item.BucketId  })
+                <a href="@item.BucketId">Download</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
