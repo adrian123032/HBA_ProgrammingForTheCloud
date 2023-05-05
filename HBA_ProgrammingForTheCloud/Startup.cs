@@ -12,23 +12,63 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Identity;
 using HBA_ProgrammingForTheCloud.DataAccess;
+using Google.Cloud.SecretManager.V1;
+using Newtonsoft.Json.Linq;
+using Google.Cloud.Diagnostics.AspNetCore3;
+using Google.Cloud.Diagnostics.Common;
 
 namespace HBA_ProgrammingForTheCloud
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        public Startup(IConfiguration configuration, IWebHostEnvironment host)
         {
             Configuration = configuration;
 
-            string credential_path = @"C:\Users\amerc\Desktop\3rd Year\Programming for the Cloud\HBA_ProgrammingForTheCloud\HBA_ProgrammingForTheCloud\hbaprogrammingforthecloud-ae18523f2725.json";
+            string credential_path = host.ContentRootPath + "\\hbaprogrammingforthecloud-ae18523f2725.json";
             System.Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", credential_path);
+        }
+
+        private string GetSecretValue(string nameOfSecret, string key)
+        {
+
+            SecretManagerServiceClient client = SecretManagerServiceClient.Create();
+
+            // Build the resource name.
+            SecretVersionName secretVersionName = new SecretVersionName(Configuration["projectid"].ToString(),
+                nameOfSecret,
+                "1");
+
+            // Call the API.
+            AccessSecretVersionResponse result = client.AccessSecretVersion(secretVersionName);
+
+            // Convert the payload to a string. Payloads are bytes by default.
+            String payload = result.Payload.Data.ToStringUtf8();
+
+            var deserializedKeys = JObject.Parse(payload);
+            var secret = deserializedKeys[key].ToString();
+            return secret;
         }
 
         public void ConfigureServices(IServiceCollection services)
         {
             string projectId = Configuration["projectid"].ToString();
+
+
+            services.AddGoogleErrorReportingForAspNetCore(new ErrorReportingServiceOptions
+            {
+                // Replace ProjectId with your Google Cloud Project ID.
+                ProjectId = projectId,
+                // Replace Service with a name or identifier for the service.
+                ServiceName = "MainWebsite",
+                // Replace Version with a version for the service.
+                Version = "1"
+            });
             services.AddControllersWithViews();
+
+            var clientId = GetSecretValue("oauth_keys", "Authentication:Google:ClientId");
+            var secretKey = GetSecretValue("oauth_keys", "Authentication:Google:ClientSecret");
+
             services.AddAuthentication( options =>
             {
                 options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
@@ -37,8 +77,8 @@ namespace HBA_ProgrammingForTheCloud
             .AddCookie()
             .AddGoogle(options =>
             {
-                options.ClientId = Configuration["Authentication:Google:ClientId"];
-                options.ClientSecret = Configuration["Authentication:Google:ClientSecret"];
+                options.ClientId = clientId;
+                options.ClientSecret = secretKey;
             });
 
             services.AddScoped<FirestoreUploadRepository>(provider => new FirestoreUploadRepository(projectId));

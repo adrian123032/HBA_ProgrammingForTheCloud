@@ -1,3 +1,4 @@
+using Google.Cloud.Diagnostics.Common;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
@@ -20,6 +21,11 @@ namespace SubscriberApp
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
+                    var config = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
+
+                    string projectId = config["projectid"];
+
+                    webBuilder.ConfigureLogging(builder => builder.AddGoogle(new LoggingServiceOptions { ProjectId = projectId }));
                     webBuilder.UseStartup<Startup>();
                 });
     }

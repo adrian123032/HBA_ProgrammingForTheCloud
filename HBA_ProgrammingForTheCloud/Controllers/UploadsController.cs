@@ -61,7 +61,7 @@ namespace HBA_ProgrammingForTheCloud.Controllers
 
             _logger.LogInformation($"User {User.Identity.Name} is creating an upload named {up.VideoName}");
             if ((ModelState.IsValid) && (fileExtension.ToLower() == ".mp4")) { 
-                if ((thumbnailExtension.ToLower() == ".jpg") || (thumbnailExtension.ToLower() == ".png")) {
+                if ((thumbnailExtension.ToLower() == ".jpg") || (thumbnailExtension.ToLower() == ".png") || (thumbnailExtension.ToLower() == ".jpeg")) {
                     _logger.LogInformation($"Validators for {up.VideoName} are ok");
                     using (MemoryStream ms = new MemoryStream())
                     {
@@ -133,13 +133,13 @@ namespace HBA_ProgrammingForTheCloud.Controllers
             {
                 //might need to add new pub sub dfrom other side to update 
                 _uploadsRepo.Update(up);
-                TempData["success"] = "Upload was updated";
+                TempData["success"] = "Transcribe is queued!";
             }
             catch (Exception ex)
 
             {
                 _logger.LogError(ex, $"{User.Identity.Name} had an error while updating an upload");
-                TempData["error"] = "Upload could not be updated";
+                TempData["error"] = "Could not transcribe!";
             }
             return RedirectToAction("Index");
         }

@@ -1,3 +1,5 @@
+using Google.Cloud.Diagnostics.AspNetCore3;
+using Google.Cloud.Diagnostics.Common;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -13,11 +15,11 @@ namespace SubscriberApp
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        public Startup(IConfiguration configuration, IWebHostEnvironment host)
         {
             Configuration = configuration;
 
-            string credential_path = @"C:\Users\amerc\Desktop\3rd Year\Programming for the Cloud\HBA_ProgrammingForTheCloud\SubscriberApp\hbaprogrammingforthecloud-ae18523f2725.json";
+            string credential_path = host.ContentRootPath + "\\hbaprogrammingforthecloud-ae18523f2725.json";
             System.Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", credential_path);
         }
 
@@ -26,6 +28,18 @@ namespace SubscriberApp
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            string projectId = Configuration["projectid"].ToString();
+
+
+            services.AddGoogleErrorReportingForAspNetCore(new ErrorReportingServiceOptions
+            {
+                // Replace ProjectId with your Google Cloud Project ID.
+                ProjectId = projectId,
+                // Replace Service with a name or identifier for the service.
+                ServiceName = "MainWebsite",
+                // Replace Version with a version for the service.
+                Version = "1"
+            });
             services.AddControllersWithViews();
         }
 
@@ -53,7 +67,7 @@ namespace SubscriberApp
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                    pattern: "{controller=Subscriber}/{action=Index}/{id?}");
             });
         }
     }
