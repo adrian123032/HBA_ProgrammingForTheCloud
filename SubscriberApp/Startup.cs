@@ -1,3 +1,4 @@
+
 using Google.Cloud.Diagnostics.AspNetCore3;
 using Google.Cloud.Diagnostics.Common;
 using Microsoft.AspNetCore.Builder;
@@ -6,6 +7,7 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using SubscriberApp.DataAccess;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -41,6 +43,7 @@ namespace SubscriberApp
                 Version = "1"
             });
             services.AddControllersWithViews();
+            services.AddScoped<PubSubFunctionRepository>(provider => new PubSubFunctionRepository(projectId));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

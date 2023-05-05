@@ -1,4 +1,5 @@
-﻿using Common.Models;
+﻿using Common.DataAccess;
+using Common.Models;
 using Google.Cloud.Firestore;
 using Google.Cloud.Storage.V1;
 using HBA_ProgrammingForTheCloud.DataAccess;
@@ -131,8 +132,6 @@ namespace HBA_ProgrammingForTheCloud.Controllers
             await _psRepository.PushMessage(up);
             try
             {
-                //might need to add new pub sub dfrom other side to update 
-                _uploadsRepo.Update(up);
                 TempData["success"] = "Transcribe is queued!";
             }
             catch (Exception ex)

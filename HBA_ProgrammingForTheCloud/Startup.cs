@@ -16,6 +16,7 @@ using Google.Cloud.SecretManager.V1;
 using Newtonsoft.Json.Linq;
 using Google.Cloud.Diagnostics.AspNetCore3;
 using Google.Cloud.Diagnostics.Common;
+using Common.DataAccess;
 
 namespace HBA_ProgrammingForTheCloud
 {

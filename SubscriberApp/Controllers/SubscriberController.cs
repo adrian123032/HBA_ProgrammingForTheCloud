@@ -21,15 +21,18 @@ using Google.Cloud.Firestore;
 using System.Text;
 using Google.Cloud.Diagnostics.AspNetCore3;
 using Microsoft.Extensions.Logging;
+using SubscriberApp.DataAccess;
 
 namespace SubscriberApp.Controllers
 {
     public class SubscriberController : Controller
     {
         ILogger<SubscriberController> _logger;
-        public SubscriberController(ILogger<SubscriberController> logger)
+        PubSubFunctionRepository _psRepository;
+        public SubscriberController(ILogger<SubscriberController> logger, PubSubFunctionRepository psRepository)
         {
             _logger = logger;
+            _psRepository = psRepository;
         }
 
         public async Task<IActionResult> Index([FromServices] IConfiguration config)
@@ -39,7 +42,7 @@ namespace SubscriberApp.Controllers
             string apikey = config["apikey"].ToString();
             string bucket1 = config["bucket1"].ToString();
             string bucket2 = config["bucket2"].ToString();
-            bool acknowledge = false;
+            bool acknowledge = true;
 
             _logger.LogInformation($"Retrieved id's and keys from setting");
 
@@ -81,45 +84,45 @@ namespace SubscriberApp.Controllers
                 var actualMessage = msg.Split(": ")[1];
                 Upload myReadUpload = JsonConvert.DeserializeObject<Upload>(actualMessage);
                 _logger.LogInformation($"Getting msg with BucketId: {myReadUpload.BucketId}");
-                /*
-                                var CloudConvert = new CloudConvertAPI(apikey);
+                
+                var CloudConvert = new CloudConvertAPI(apikey);
 
-                                var job = await CloudConvert.CreateJobAsync(new JobCreateRequest
-                                {
-                                    Tasks = new
-                                    {
-                                        import_it = new ImportUrlCreateRequest
-                                        {
-                                            Url = myReadUpload.BucketId
-                                        },
-                                        convert = new ConvertCreateRequest
-                                        {
-                                            Input = "import_it",
-                                            Input_Format = "mp4",
-                                            Output_Format = "flac"
-                                        },
-                                        export_it = new ExportUrlCreateRequest
-                                        {
-                                            Input = "convert"
-                                        }
-                                    }
-                                });
+                var job = await CloudConvert.CreateJobAsync(new JobCreateRequest
+                {
+                    Tasks = new
+                    {
+                        import_it = new ImportUrlCreateRequest
+                        {
+                            Url = myReadUpload.BucketId
+                        },
+                        convert = new ConvertCreateRequest
+                        {
+                            Input = "import_it",
+                            Input_Format = "mp4",
+                            Output_Format = "flac"
+                        },
+                        export_it = new ExportUrlCreateRequest
+                        {
+                            Input = "convert"
+                        }
+                    }
+                });
 
-                                job = await CloudConvert.WaitJobAsync(job.Data.Id);
-                                 _logger.LogInformation($"File sent to conversion API");
+                job = await CloudConvert.WaitJobAsync(job.Data.Id);
+                 _logger.LogInformation($"File sent to conversion API");
 
-                                var exportTask = job.Data.Tasks.FirstOrDefault(t => t.Name == "export_it");
+                var exportTask = job.Data.Tasks.FirstOrDefault(t => t.Name == "export_it");
 
-                                var fileExport = exportTask.Result.Files.FirstOrDefault();
-                                _logger.LogInformation($"File {fileExport.FileName} retrieved back from API");
+                var fileExport = exportTask.Result.Files.FirstOrDefault();
+                _logger.LogInformation($"File {fileExport.Filename} retrieved back from API");
 
-                                var webClient = new WebClient();
-                                var fileStream = webClient.OpenRead(fileExport.Url);
-                                var storage = StorageClient.Create();
-                                storage.UploadObject(bucket2, fileExport.Filename, null, fileStream);
-                                _logger.LogInformation($"File {fileExport.FileName} uploaded to {bucket2}");
+                var webClient = new WebClient();
+                var fileStream = webClient.OpenRead(fileExport.Url);
+                var storage = StorageClient.Create();
+                storage.UploadObject(bucket2, fileExport.Filename, null, fileStream);
+                _logger.LogInformation($"File {fileExport.Filename} uploaded to {bucket2}");
 
-                                */
+                                
 
                 var speech = SpeechClient.Create();
                 var configer = new RecognitionConfig
@@ -139,39 +142,27 @@ namespace SubscriberApp.Controllers
                 string start = "00:00:00,000";
                 foreach (var result in response.Results)
                 {
+                    up.Transcription = result.ToString();
                     foreach (var alternative in result.Alternatives)
-                    {
-                        
-                        string end = result.ResultEndTime.ToString().Replace('.', ',');
-                        end = end.Replace("{", "");
-                        end = end.Replace("}", "");
-                        end = end.Replace("\"", "");
-                        _logger.LogInformation($"Transcript: {alternative} retrieved for next {end} and added to SRT Builder");
-                        end = end.Replace("s", "");
-
-                        string end1 = end.Split(",")[0];
-                        string end2 = end.Split(",")[1];
-                        // Add the first SRT entry
-                        sb.AppendLine($"{step}");
-                        step++;
-                        sb.AppendLine($"{start} --> {start = new TimeSpan(0,0,0,int.Parse(end1),int.Parse(end2)).ToString(@"hh\:mm\:ss\,fff")}");
-                        sb.AppendLine($"{alternative}");
-                        sb.AppendLine();
+                    {                       
                     }
                 }
 
                 up.Transcribed = true;
                 FirestoreDb db =  FirestoreDb.Create(projectId);
-                Query booksQuery = db.Collection("uploads").WhereEqualTo("BucketId", myReadUpload.BucketId);
-                QuerySnapshot booksQuerySnapshot = await booksQuery.GetSnapshotAsync();
+                Query uploadsQuery = db.Collection("uploads").WhereEqualTo("BucketId", myReadUpload.BucketId);
+                QuerySnapshot uploadsQuerySnapshot = await uploadsQuery.GetSnapshotAsync();
 
-                DocumentSnapshot documentSnapshot = booksQuerySnapshot.Documents.FirstOrDefault();
+                DocumentSnapshot documentSnapshot = uploadsQuerySnapshot.Documents.FirstOrDefault();
                 if (documentSnapshot.Exists == false) throw new Exception("Upload does not exist");
                 else
                 {
-                    DocumentReference booksRef = db.Collection("uploads").Document(documentSnapshot.Id);
-                    await booksRef.SetAsync(up);
+                    DocumentReference uploadsRef = db.Collection("uploads").Document(documentSnapshot.Id);
+                    await uploadsRef.SetAsync(up);
+                    await _psRepository.PushId(documentSnapshot.Id);
                 }
+
+                
 
 
                 /*Download Original Video
