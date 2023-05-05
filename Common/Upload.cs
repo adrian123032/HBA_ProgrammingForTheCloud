@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace HBA_ProgrammingForTheCloud.Models
+namespace Common.Models
 {
     [FirestoreData]
     public class Upload

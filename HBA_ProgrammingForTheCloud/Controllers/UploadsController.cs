@@ -1,7 +1,7 @@
-﻿using Google.Cloud.Firestore;
+﻿using Common.Models;
+using Google.Cloud.Firestore;
 using Google.Cloud.Storage.V1;
 using HBA_ProgrammingForTheCloud.DataAccess;
-using HBA_ProgrammingForTheCloud.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -20,10 +20,12 @@ namespace HBA_ProgrammingForTheCloud.Controllers
     {
         FirestoreUploadRepository _uploadsRepo;
         ILogger<UploadsController> _logger;
-        public UploadsController(FirestoreUploadRepository uploadsRepo, ILogger<UploadsController> logger)
+        PubSubTranscriptRepository _psRepository;
+        public UploadsController(FirestoreUploadRepository uploadsRepo, ILogger<UploadsController> logger, PubSubTranscriptRepository psRepository)
         {
             _uploadsRepo = uploadsRepo;
             _logger = logger;
+            _psRepository = psRepository;
         }
         public async Task<IActionResult> Index()
         {
@@ -42,6 +44,7 @@ namespace HBA_ProgrammingForTheCloud.Controllers
             up.UploadDate = Timestamp.FromDateTime(DateTime.Now.ToUniversalTime());
             up.Username = User.Identity.Name;
             up.Transcribed = false;
+            up.Transcription = "";
 
             byte[] bytes;
             string fileExtension = ""; 
@@ -125,8 +128,10 @@ namespace HBA_ProgrammingForTheCloud.Controllers
         public async Task<IActionResult> Transcribe(string bucketId)
         {
             Upload up = await _uploadsRepo.GetUpload(bucketId);
+            await _psRepository.PushMessage(up);
             try
             {
+                //might need to add new pub sub dfrom other side to update 
                 _uploadsRepo.Update(up);
                 TempData["success"] = "Upload was updated";
             }

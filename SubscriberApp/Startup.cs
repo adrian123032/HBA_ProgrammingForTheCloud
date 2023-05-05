@@ -8,12 +8,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.Google;
-using Microsoft.AspNetCore.Identity;
-using HBA_ProgrammingForTheCloud.DataAccess;
 
-namespace HBA_ProgrammingForTheCloud
+namespace SubscriberApp
 {
     public class Startup
     {
@@ -21,33 +17,17 @@ namespace HBA_ProgrammingForTheCloud
         {
             Configuration = configuration;
 
-            string credential_path = @"C:\Users\amerc\Desktop\3rd Year\Programming for the Cloud\HBA_ProgrammingForTheCloud\HBA_ProgrammingForTheCloud\hbaprogrammingforthecloud-ae18523f2725.json";
+            string credential_path = @"C:\Users\amerc\Desktop\3rd Year\Programming for the Cloud\HBA_ProgrammingForTheCloud\SubscriberApp\hbaprogrammingforthecloud-ae18523f2725.json";
             System.Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", credential_path);
         }
 
-        public void ConfigureServices(IServiceCollection services)
-        {
-            string projectId = Configuration["projectid"].ToString();
-            services.AddControllersWithViews();
-            services.AddAuthentication( options =>
-            {
-                options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
-            })
-            .AddCookie()
-            .AddGoogle(options =>
-            {
-                options.ClientId = Configuration["Authentication:Google:ClientId"];
-                options.ClientSecret = Configuration["Authentication:Google:ClientSecret"];
-            });
-
-            services.AddScoped<FirestoreUploadRepository>(provider => new FirestoreUploadRepository(projectId));
-            services.AddScoped<PubSubTranscriptRepository>(provider => new PubSubTranscriptRepository(projectId));
-        }
-
-
         public IConfiguration Configuration { get; }
 
+        // This method gets called by the runtime. Use this method to add services to the container.
+        public void ConfigureServices(IServiceCollection services)
+        {
+            services.AddControllersWithViews();
+        }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -67,7 +47,6 @@ namespace HBA_ProgrammingForTheCloud
 
             app.UseRouting();
 
-            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
@@ -76,9 +55,6 @@ namespace HBA_ProgrammingForTheCloud
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
             });
-
-            
-
         }
     }
 }
