@@ -22,16 +22,19 @@ using System.Text;
 using Google.Cloud.Diagnostics.AspNetCore3;
 using Microsoft.Extensions.Logging;
 using SubscriberApp.DataAccess;
+using Common.DataAccess;
 
 namespace SubscriberApp.Controllers
 {
     public class SubscriberController : Controller
     {
         ILogger<SubscriberController> _logger;
-        PubSubFunctionRepository _psRepository;
-        public SubscriberController(ILogger<SubscriberController> logger, PubSubFunctionRepository psRepository)
+        PubSubTranscriptRepository _psRepository;
+        PubSubFunctionRepository _psfRepository;
+        public SubscriberController(ILogger<SubscriberController> logger, PubSubFunctionRepository psfRepository, PubSubTranscriptRepository psRepository)
         {
             _logger = logger;
+            _psfRepository = psfRepository;
             _psRepository = psRepository;
         }
 
@@ -71,7 +74,7 @@ namespace SubscriberApp.Controllers
                 //no acknowledgement implies that the message is not going to be removed from the queue
             });
             // Run for 5 seconds.
-            await Task.Delay(5000);
+            await Task.Delay(10000);
             await subscriber.StopAsync(CancellationToken.None);
             // Lets make sure that the start task finished successfully after the call to stop.
             await startTask;
@@ -131,7 +134,7 @@ namespace SubscriberApp.Controllers
                     AudioChannelCount = 2,
                     LanguageCode = LanguageCodes.English.UnitedStates
                 };
-                var audio = RecognitionAudio.FromStorageUri($"gs://{bucket2}/f4027a29-8b81-44fc-9f0b-f15241b4969d.flac"); //{fileExport.Filename}");
+                var audio = RecognitionAudio.FromStorageUri($"gs://{bucket2}/{fileExport.Filename}");
                 //_logger.LogInformation($"File {fileExport.FileName} retrieved from {bucket2} and given to Speech to Text API");
 
                 var response = speech.Recognize(configer, audio);
@@ -142,13 +145,12 @@ namespace SubscriberApp.Controllers
                 string start = "00:00:00,000";
                 foreach (var result in response.Results)
                 {
-                    up.Transcription = result.ToString();
+                    up.Transcription = response.ToString();
                     foreach (var alternative in result.Alternatives)
                     {                       
                     }
                 }
-
-                up.Transcribed = true;
+                up.Queued = true;
                 FirestoreDb db =  FirestoreDb.Create(projectId);
                 Query uploadsQuery = db.Collection("uploads").WhereEqualTo("BucketId", myReadUpload.BucketId);
                 QuerySnapshot uploadsQuerySnapshot = await uploadsQuery.GetSnapshotAsync();
@@ -159,27 +161,14 @@ namespace SubscriberApp.Controllers
                 {
                     DocumentReference uploadsRef = db.Collection("uploads").Document(documentSnapshot.Id);
                     await uploadsRef.SetAsync(up);
-                    await _psRepository.PushId(documentSnapshot.Id);
+                    await _psfRepository.PushId(documentSnapshot.Id);
                 }
 
-                
+                string bucketName = config["bucket2"].ToString();
+                storage.DeleteObject(bucketName, fileExport.Filename);
 
 
-                /*Download Original Video
-                var uploadTask = job.Data.Tasks.FirstOrDefault(t => t.Name == "import_it");
-                var actualId = myReadUpload.BucketId.Split($"{bucket1}/")[1];
-                var storage = StorageClient.Create();
-                var stream = new MemoryStream();
-          
-                    storage.DownloadObject(bucket1, actualId, stream);
-
-                using (var fileStream = new FileStream("your-file-name.mp4", FileMode.Create, FileAccess.Write))
-                {
-                    stream.WriteTo(fileStream);
-                }*/
-
-
-            }
+                }
             return Content("Messages read and processed from queue: " + messageCount.ToString());
         }
     }

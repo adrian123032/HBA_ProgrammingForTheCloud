@@ -1,4 +1,5 @@
 
+using Common.DataAccess;
 using Google.Cloud.Diagnostics.AspNetCore3;
 using Google.Cloud.Diagnostics.Common;
 using Microsoft.AspNetCore.Builder;
@@ -44,6 +45,7 @@ namespace SubscriberApp
             });
             services.AddControllersWithViews();
             services.AddScoped<PubSubFunctionRepository>(provider => new PubSubFunctionRepository(projectId));
+            services.AddScoped<PubSubTranscriptRepository>(provider => new PubSubTranscriptRepository(projectId));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

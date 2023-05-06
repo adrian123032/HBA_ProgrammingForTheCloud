@@ -29,6 +29,8 @@ namespace Common.Models
         [FirestoreProperty]
         public bool Transcribed { get; set; }
         [FirestoreProperty]
-        public string Transcription { get; set; }  
+        public string Transcription { get; set; }
+        [FirestoreProperty]
+        public bool Queued { get; set; }
     }
 }

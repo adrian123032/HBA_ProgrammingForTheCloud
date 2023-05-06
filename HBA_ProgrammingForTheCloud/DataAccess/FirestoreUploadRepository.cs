@@ -1,5 +1,8 @@
 ﻿using Common.Models;
 using Google.Cloud.Firestore;
+using Google.Cloud.Storage.V1;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -83,7 +86,6 @@ namespace HBA_ProgrammingForTheCloud.DataAccess
 
         public async Task Delete(string bucketId)
         {
-
             Query uploadsQuery = db.Collection("uploads").WhereEqualTo("BucketId", bucketId);
             QuerySnapshot uploadsQuerySnapshot = await uploadsQuery.GetSnapshotAsync();
 
@@ -93,6 +95,7 @@ namespace HBA_ProgrammingForTheCloud.DataAccess
             {
                 DocumentReference uploadsRef = db.Collection("uploads").Document(documentSnapshot.Id);
                 await uploadsRef.DeleteAsync();
+
             }
         }
     }

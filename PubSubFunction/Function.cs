@@ -34,20 +34,22 @@ namespace PubSubFunction;
 
             var name = string.IsNullOrEmpty(FromMessage) ? "world" : FromMessage;
             
-            _logger.LogInformation($"Name is {name}");
+            _logger.LogInformation($"Upload Id is {name}");
 
             FirestoreDb db = FirestoreDb.Create("hbaprogrammingforthecloud");
             DocumentReference docRef = db.Collection("uploads").Document(FromMessage);
             DocumentSnapshot docSnap = docRef.GetSnapshotAsync().Result;
+            _logger.LogInformation($"Retrieving Upload Snapshot");
 
             string jsonString = JsonConvert.SerializeObject(docSnap.ToDictionary());
-
+            _logger.LogInformation($"Serializing retrieved Upload");
             // Deserialize the JSON string to a dictionary
             Dictionary<string, object> docData = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
 
             // Access the values in the dictionary
-            string transciption = docData["Transctiption"].ToString();
-            JsonDocument jsonDocument = JsonDocument.Parse(transciption);
+            string transcription = docData["Transcription"].ToString();
+            _logger.LogInformation($"Retrieved transcription: {transcription}");
+            JsonDocument jsonDocument = JsonDocument.Parse(transcription);
 
             var sb = new StringBuilder();
             int step = 1;
@@ -59,6 +61,7 @@ namespace PubSubFunction;
                 JsonElement alternatives = result.GetProperty("alternatives");
                 foreach (JsonElement alternative in alternatives.EnumerateArray())
                 {
+                    _logger.LogInformation($"Building SRT string");
                     string transcript = alternative.GetProperty("transcript").GetString();
                     string resultEndTime = result.GetProperty("resultEndTime").GetString();
                         string end = resultEndTime.ToString().Replace('.', ',');
@@ -84,13 +87,12 @@ namespace PubSubFunction;
             }
             Dictionary<string, object> update = new Dictionary<string, object>
             {
-                { "transribed", true },
-                {"transcription", sb.ToString()}
+                { "Transcribed", true },
+                { "Transcription", sb.ToString() }
             };
             var t = docRef.SetAsync(update, SetOptions.MergeAll);
-            //code other things so that they are executed meanwhile
-
             t.Wait();
+            _logger.LogInformation($"Updated values to firestore");
             return Task.CompletedTask;
         }
     }

@@ -4,6 +4,7 @@ using Google.Cloud.Firestore;
 using Google.Cloud.Storage.V1;
 using HBA_ProgrammingForTheCloud.DataAccess;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -22,11 +23,13 @@ namespace HBA_ProgrammingForTheCloud.Controllers
         FirestoreUploadRepository _uploadsRepo;
         ILogger<UploadsController> _logger;
         PubSubTranscriptRepository _psRepository;
-        public UploadsController(FirestoreUploadRepository uploadsRepo, ILogger<UploadsController> logger, PubSubTranscriptRepository psRepository)
+        IWebHostEnvironment _hostingEnvironment;
+        public UploadsController(FirestoreUploadRepository uploadsRepo, ILogger<UploadsController> logger, PubSubTranscriptRepository psRepository, IWebHostEnvironment hostingEnvironment)
         {
             _uploadsRepo = uploadsRepo;
             _logger = logger;
             _psRepository = psRepository;
+            _hostingEnvironment = hostingEnvironment;
         }
         public async Task<IActionResult> Index()
         {
@@ -46,6 +49,7 @@ namespace HBA_ProgrammingForTheCloud.Controllers
             up.Username = User.Identity.Name;
             up.Transcribed = false;
             up.Transcription = "";
+            up.Queued = false;
 
             byte[] bytes;
             string fileExtension = ""; 
@@ -107,12 +111,24 @@ namespace HBA_ProgrammingForTheCloud.Controllers
             return View();
         }
 
-        public async Task<IActionResult> Delete(string BucketId)
+        public async Task<IActionResult> Delete(string BucketId, [FromServices] IConfiguration config)
         {
+            string bucketName = config["bucket"].ToString();
             try
             {
-                await _uploadsRepo.Delete(BucketId);
-                TempData["success"] = "Upload was deleted successfully from the database";
+                Upload up = await _uploadsRepo.GetUpload(BucketId);
+                if (up.Queued && !up.Transcribed)
+                {
+                    TempData["error"] = "This upload is being transcribed, please try again later.";
+                }
+                else
+                {
+                    await _uploadsRepo.Delete(BucketId);
+                    var storage = StorageClient.Create();
+                    string name = up.BucketId.Split($"{bucketName}/")[1];
+                    storage.DeleteObject(bucketName, name);
+                    TempData["success"] = "Upload was deleted successfully from the database";
+                }
             }
             catch (Exception ex)
             {
@@ -129,16 +145,38 @@ namespace HBA_ProgrammingForTheCloud.Controllers
         public async Task<IActionResult> Transcribe(string bucketId)
         {
             Upload up = await _uploadsRepo.GetUpload(bucketId);
-            await _psRepository.PushMessage(up);
-            try
-            {
-                TempData["success"] = "Transcribe is queued!";
-            }
-            catch (Exception ex)
+            if (!up.Queued && !up.Transcribed) {
+                up.Queued = true;
+                _uploadsRepo.Update(up);
+                await _psRepository.PushMessage(up);
+                try
+                {
+                    TempData["success"] = "Transcribe is queued!";
+                }
+                catch (Exception ex)
 
+                {
+                    _logger.LogError(ex, $"{User.Identity.Name} had an error while updating an upload");
+                    TempData["error"] = "Could not transcribe!";
+                }
+            }
+            else if(!up.Transcribed)
             {
-                _logger.LogError(ex, $"{User.Identity.Name} had an error while updating an upload");
-                TempData["error"] = "Could not transcribe!";
+                TempData["error"] = "Transcribe still processing please check back later!";
+            }
+            else
+            {
+                string rootPath = _hostingEnvironment.ContentRootPath;
+                string downloadsPath = Path.Combine(rootPath, "Downloads");
+                Directory.CreateDirectory(downloadsPath);
+                string filePath = Path.Combine(downloadsPath,$"{ Guid.NewGuid().ToString()}.srt");
+
+                using (StreamWriter writer = new StreamWriter(filePath))
+                {
+                    // Write the SRT content to the file
+                    writer.Write(up.Transcription);
+                }
+                TempData["success"] = "Transcribe has downloaded!";
             }
             return RedirectToAction("Index");
         }
