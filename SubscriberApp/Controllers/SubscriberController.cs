@@ -29,13 +29,11 @@ namespace SubscriberApp.Controllers
     public class SubscriberController : Controller
     {
         ILogger<SubscriberController> _logger;
-        PubSubTranscriptRepository _psRepository;
         PubSubFunctionRepository _psfRepository;
-        public SubscriberController(ILogger<SubscriberController> logger, PubSubFunctionRepository psfRepository, PubSubTranscriptRepository psRepository)
+        public SubscriberController(ILogger<SubscriberController> logger, PubSubFunctionRepository psfRepository)
         {
             _logger = logger;
             _psfRepository = psfRepository;
-            _psRepository = psRepository;
         }
 
         public async Task<IActionResult> Index([FromServices] IConfiguration config)
