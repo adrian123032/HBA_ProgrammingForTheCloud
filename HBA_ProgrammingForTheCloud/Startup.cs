@@ -17,6 +17,7 @@ using Newtonsoft.Json.Linq;
 using Google.Cloud.Diagnostics.AspNetCore3;
 using Google.Cloud.Diagnostics.Common;
 using Common.DataAccess;
+using Microsoft.AspNetCore.Http;
 
 namespace HBA_ProgrammingForTheCloud
 {
@@ -26,7 +27,7 @@ namespace HBA_ProgrammingForTheCloud
         {
             Configuration = configuration;
 
-            string credential_path = host.ContentRootPath + "\\hbaprogrammingforthecloud-ae18523f2725.json";
+            string credential_path = host.ContentRootPath + "/hbaprogrammingforthecloud-ae18523f2725.json";
             System.Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", credential_path);
         }
 
@@ -82,6 +83,13 @@ namespace HBA_ProgrammingForTheCloud
                 options.ClientSecret = secretKey;
             });
 
+            services.Configure<CookiePolicyOptions>(options =>
+            {
+                options.MinimumSameSitePolicy = Microsoft.AspNetCore.Http.SameSiteMode.Unspecified;
+                options.OnAppendCookie = cookieContext => CheckSameSite(cookieContext.Context, cookieContext.CookieOptions);
+                options.OnDeleteCookie = cookieContext => CheckSameSite(cookieContext.Context, cookieContext.CookieOptions);
+            });
+
             services.AddScoped<FirestoreUploadRepository>(provider => new FirestoreUploadRepository(projectId));
             services.AddScoped<PubSubTranscriptRepository>(provider => new PubSubTranscriptRepository(projectId));
         }
@@ -107,7 +115,7 @@ namespace HBA_ProgrammingForTheCloud
             app.UseStaticFiles();
 
             app.UseRouting();
-
+            app.UseCookiePolicy();
             app.UseAuthentication();
             app.UseAuthorization();
 
@@ -116,10 +124,21 @@ namespace HBA_ProgrammingForTheCloud
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
-            });
+            }); 
 
-            
+        }
 
+        private void CheckSameSite(HttpContext httpContext, CookieOptions options)
+        {
+            if(options.SameSite == SameSiteMode.None)
+            {
+                var userAgent = httpContext.Request.Headers["User-Agent"].ToString();
+
+                if(true)
+                {
+                    options.SameSite = SameSiteMode.Unspecified;
+                }
+            }
         }
     }
 }

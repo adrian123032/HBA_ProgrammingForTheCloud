@@ -13,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace HBA_ProgrammingForTheCloud.Controllers
@@ -166,17 +167,13 @@ namespace HBA_ProgrammingForTheCloud.Controllers
             }
             else
             {
-                string rootPath = _hostingEnvironment.ContentRootPath;
-                string downloadsPath = Path.Combine(rootPath, "Downloads");
-                Directory.CreateDirectory(downloadsPath);
-                string filePath = Path.Combine(downloadsPath,$"{ Guid.NewGuid().ToString()}.srt");
 
-                using (StreamWriter writer = new StreamWriter(filePath))
-                {
-                    // Write the SRT content to the file
-                    writer.Write(up.Transcription);
-                }
                 TempData["success"] = "Transcribe has downloaded!";
+                MemoryStream stream = new MemoryStream(Encoding.ASCII.GetBytes(up.Transcription));
+                return new FileStreamResult(stream, "text/plain")
+                {
+                    FileDownloadName = $"{ Guid.NewGuid().ToString()}.srt"
+                };
             }
             return RedirectToAction("Index");
         }

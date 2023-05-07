@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "hbaprogrammingforthecloud",
+  "private_key_id": "ae18523f2725629ed56bdcfedd13352f4459e2c3",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEuwIBADANBgkqhkiG9w0BAQEFAASCBKUwggShAgEAAoIBAQDO6/2+jL1viCN1\nTMT8BA1TWX6Jq6oVj5fqaowHkW703IOFXsP5e6Ligxxl0VCnrd8g2J4AfDQ3yEB/\nXgPxFuECl9X4CQoyWvW8T0zJcJbY9XZRsU+ukQjnM/Z2rDbIjeZGxvQ8jH+W40Bc\nnMIGzI8dQIWs0Gc6KTA5xB+BCSIsp1SqvSZYlwAOmoGY6gzLCw6I3pFx+vR93xHe\nduLjtQRG70G6gy6VzTzkvjXC8UtiQ8tw7Pn4a8t+RnmKvfnrOaDuUINGJ772Ja0d\nVSCfe4vQLyJ1VBRS3oj5EYIa7e6kWlbDR5pLlHct5Ti0xvy7q3O6TXrD2WLFh/9A\nCS5Q+i7RAgMBAAECgf8Wkc5qSRb+E1F8A7w9mW6flQ+uaqiFE/0bgNJixdyjJ2pE\nv2AqrsfGshArz9BLF10rX2GNv6+joQyi/zu9mhAEmtnjNAWGPXlVJIw7k/iRYtI2\nPkg3mtVKE9cJQg5BgxFf4gTB0Qd8Hv6rG1pdPBoRUdD0CIwmLlfs4WPJYIRtbe9+\nbi+t9zgNc+LP1VsJyKijwUcSuOCzdVrkKqhUaTEfC1KqTNYDoJvrZ/KJc0IN/ncT\nZJ0WcpicHSC6bQUZ22vBot3kqULjAhjtoYXbeIoVGFbsAM5rvhYnu+frUnBPxnvk\nBHGTZEm51QFgSNl62QHH4mG9UGlDBbrOoDJJmAECgYEA7bzmCoUcpCXQjATvM3cB\n1em6+5cCjPKNK5yxA0MKV2nyucbL/lEl8Cgb76Q3Z2iPBJ05fHBKT+CUSXuzgAKy\nmXR5IKjv4V7Z1mDwcawHTnPcprF8+b5hSDRHWnSK2WJc/CgOll+cdoOH4ioFt0Qk\n1RHQR+8F+RDoaAnGRODzAIECgYEA3tEYzqcQzJRZr3NKal9zqzfoZhCR5ARb9swn\nGdfAsSb8sLLDhNXqOZ4rmpDazQKt5Te7+uM/4sI08glCYglj60ioEC9MT8CM3apu\npvLOZiDoWyswVt5xjHYJxUaAPf5wxVZzTizy55vdVVa6+KPpHuQFOoL8WG/EVzAu\nbWgUBlECgYAbTBZJ3PDl9CWW/jYM/bwrOLQskTFMx8jn2g0FJ9x3HwYsyKPBpsWp\nZqGWiY+HAx1w1TC1lhsiQtIkAd0hdK3XKuWBl4Q7p21xzR2un6cTHgCW70g/UNnQ\ntZf/zePnhADTPzI1l/LaNM4UbOjNGzjzciEtMUfJSmS1FXI7lGyygQKBgFB1LsEI\ngL9u3kfFmNx6ZTkxcgDRAO1WSaL/qyrgxprxmhNwKbvgxrhRjis9HVUkH4kCrCV3\nQ81tFVNE1qyx+Vuvm8hkW+j8faFZdqVgTfmA7oZlPQpRPq1avkJ3J727EBuiEPbs\nsjXCCZVUQSWhgn9+FQlA3UBN85cMNeeZyolRAoGBAMn5wrxOgQqX2buDH3wXUe4q\neVGkk5diagwOeSWrH0qRYfkCVE0u7Qv0uSsNe/4JMjac9+dwC6yOHwNn/4Zq4a4I\nmPNompyzjsxh7hcIHQF7PRkQo0BGZA6x9P8hkK5OT2srKCvgz85KPfmlDGY6Mq+0\nYoSYgO58fN3drr3OFem/\n-----END PRIVATE KEY-----\n",
+  "client_email": "hba-pfc-service@hbaprogrammingforthecloud.iam.gserviceaccount.com",
+  "client_id": "106943584737375850645",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/hba-pfc-service%40hbaprogrammingforthecloud.iam.gserviceaccount.com"
+}

@@ -22,7 +22,7 @@ namespace SubscriberApp
         {
             Configuration = configuration;
 
-            string credential_path = host.ContentRootPath + "\\hbaprogrammingforthecloud-ae18523f2725.json";
+            string credential_path = host.ContentRootPath + "/hbaprogrammingforthecloud-ae18523f2725.json";
             System.Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", credential_path);
         }
 
